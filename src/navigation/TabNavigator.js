@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen from '../screens/HomeScreen';
+import CartScreen from '../screens/CartScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,7 +26,7 @@ const TabNavigator = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007bff',
+        tabBarActiveTintColor: '#36c441',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
           paddingBottom: 8,
@@ -34,11 +35,29 @@ const TabNavigator = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Inicio' }}/>
-      <Tab.Screen name="CartTab" component={HomeScreen} options={{ title: 'Carrito' }}/>
-      <Tab.Screen name="OrdersTab" component={HomeScreen} options={{ title: 'Pedidos' }} />
-      <Tab.Screen name="ProfileTab" component={HomeScreen}  options={{ title: 'Perfil' }} />
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
+        options={{ title: 'Inicio' }}
+      />
 
+      <Tab.Screen
+        name="CartTab"
+        component={CartScreen}
+        options={{ title: 'Carrito' }}
+      />
+
+      <Tab.Screen
+        name="OrdersTab"
+        component={HomeScreen} // Temporal
+        options={{ title: 'Pedidos' }}
+      />
+
+      <Tab.Screen
+        name="ProfileTab"
+        component={HomeScreen} // Temporal
+        options={{ title: 'Perfil' }}
+      />
     </Tab.Navigator>
   );
 };

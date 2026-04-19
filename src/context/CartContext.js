@@ -61,6 +61,8 @@ export const CartProvider = ({ children }) => {
 
   // Agregar producto al carrito
   const addToCart = (product) => {
+    console.log("Agregando producto:", product.title);   // ← Debug
+    
     setCart((currentCart) => {
       const existingProduct = currentCart.find(item => item.id === product.id);
 

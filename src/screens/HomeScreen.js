@@ -76,7 +76,7 @@ const renderProduct = ({ item }) => (
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#358a3c" />
         <Text style={styles.loadingText}>Cargando productos...</Text>
       </View>
     );
@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
+    marginTop: 16,
     color: '#fff',
   },
   categoryScroll: {

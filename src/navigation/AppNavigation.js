@@ -10,7 +10,7 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="MainTabs" screenOptions={{
         headerStyle: {
-          backgroundColor: '#007bff',
+          backgroundColor: '#629766',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {

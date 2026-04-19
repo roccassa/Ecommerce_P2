@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert,SafeAreaView,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useCart } from '../context/CartContext';
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { product } = route.params;
+  const { addToCart } = useCart();
 
   if (product == false) {
     return (
@@ -14,12 +16,13 @@ const ProductDetailScreen = ({ route, navigation }) => {
   }
 
   const handleAddToCart = () => {
-    // Por ahora solo mostramos un mensaje (el carrito lo implementaremos después)
+    addToCart(product);
     Alert.alert(
       'Producto agregado',
       `${product.title} se ha añadido al carrito`,
       [
-        { text: 'Ver carrito', onPress: () => navigation.navigate('Cart') },
+        { text: 'Ver carrito', onPress: () => navigation.navigate('MainTabs', { 
+            screen: 'CartTab'}) },
         { text: 'Seguir comprando', style: 'cancel' },
       ]
     );
@@ -27,6 +30,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Imagen del producto */}
         <View style={styles.imageContainer}>
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   addToCartButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#629766',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
