@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen from '../screens/HomeScreen';
 import CartScreen from '../screens/CartScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,9 +54,9 @@ const TabNavigator = () => {
         options={{ title: 'Pedidos' }}
       />
 
-      <Tab.Screen
+     <Tab.Screen
         name="ProfileTab"
-        component={HomeScreen} // Temporal
+        component={ProfileScreen}
         options={{ title: 'Perfil' }}
       />
     </Tab.Navigator>
