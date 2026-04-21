@@ -8,7 +8,7 @@ export const useCart = () => {
   if (!context) throw new Error('useCart debe usarse dentro de un CartProvider');
   return context;
 };
-
+//--- Recuerda qagregar los cambios de navegacion en las vistas toni --
 export const CartProvider = ({ children }) => {
   // --- ESTADOS GLOBALES ---
   const [user, setUser] = useState(null);
