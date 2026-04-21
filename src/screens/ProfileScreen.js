@@ -9,13 +9,13 @@ const ProfileScreen = ({ navigation }) => {
   const handleLogout = () => {
     Alert.alert('Cerrar sesión', '¿Estás seguro de que quieres salir?', [
       { text: 'Cancelar', style: 'cancel' },
-      { 
-        text: 'Cerrar sesión', 
-        style: 'destructive', 
+      {
+        text: 'Cerrar sesión',
+        style: 'destructive',
         onPress: async () => {
           await logoutUser();
           navigation.replace('Login');
-        } 
+        }
       },
     ]);
   };
@@ -35,7 +35,7 @@ const ProfileScreen = ({ navigation }) => {
 
       <SafeAreaView style={styles.contentSafeArea}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
-          
+
           {/* TARJETA DE PERFIL */}
           <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
@@ -57,11 +57,11 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </View>
 
-        
+
           <Text style={styles.sectionLabel}>Ajustes de Cuenta</Text>
           <View style={styles.optionsContainer}>
-            
-            
+
+
             <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('EditProfile')}>
               <View style={[styles.iconBox, { backgroundColor: '#e8f5e9' }]}>
                 <Ionicons name="create-outline" size={22} color="#2e7d32" />
@@ -70,7 +70,7 @@ const ProfileScreen = ({ navigation }) => {
               <Ionicons name="chevron-forward" size={20} color="#ccc" />
             </TouchableOpacity>
 
-           
+
             <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('ShippingAddress')}>
               <View style={[styles.iconBox, { backgroundColor: '#fff3e0' }]}>
                 <Ionicons name="location-outline" size={22} color="#ef6c00" />
@@ -79,8 +79,11 @@ const ProfileScreen = ({ navigation }) => {
               <Ionicons name="chevron-forward" size={20} color="#ccc" />
             </TouchableOpacity>
 
-          
-            <TouchableOpacity style={styles.optionItem} onPress={() => handleFeatureUnderDev('Configuración')}>
+
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={() => navigation.navigate('Settings')}
+            >
               <View style={[styles.iconBox, { backgroundColor: '#e3f2fd' }]}>
                 <Ionicons name="settings-outline" size={22} color="#1565c0" />
               </View>
@@ -90,12 +93,12 @@ const ProfileScreen = ({ navigation }) => {
 
           </View>
 
-          
+
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Ionicons name="log-out-outline" size={22} color="#fff" />
             <Text style={styles.logoutText}>Cerrar sesión</Text>
           </TouchableOpacity>
-          
+
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
   statNumber: { fontSize: 20, fontWeight: '700', color: '#629766' },
   statLabel: { fontSize: 12, color: '#999', marginTop: 2 },
   statDivider: { width: 1, height: 30, backgroundColor: '#ddd' },
-  
+
   sectionLabel: {
     fontSize: 14,
     fontWeight: '700',

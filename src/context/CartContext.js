@@ -5,48 +5,45 @@ const CartContext = createContext();
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart debe usarse dentro de un CartProvider');
-  }
+  if (!context) throw new Error('useCart debe usarse dentro de un CartProvider');
   return context;
 };
 
 export const CartProvider = ({ children }) => {
+  // --- ESTADOS GLOBALES ---
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. CARGAR DATOS AL INICIAR
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const savedCart = await AsyncStorage.getItem('cart');
-        const savedOrders = await AsyncStorage.getItem('orders');
-        const savedUser = await AsyncStorage.getItem('user');
 
-        if (savedCart) setCart(JSON.parse(savedCart));
-        if (savedOrders) setOrders(JSON.parse(savedOrders));
-        if (savedUser) setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error cargando datos:', error);
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      try {
+        
+        const [sCart, sOrders, sUser] = await Promise.all([
+          AsyncStorage.getItem('cart'),
+          AsyncStorage.getItem('orders'),
+          AsyncStorage.getItem('user'),
+        ]);
+
+        if (sCart) setCart(JSON.parse(sCart));
+        if (sOrders) setOrders(JSON.parse(sOrders));
+        if (sUser) setUser(JSON.parse(sUser));
+      } catch (e) {
+        console.error("Error en la sincronización de datos:", e);
       } finally {
         setLoading(false);
       }
     };
-    loadData();
+    bootstrapAsync();
   }, []);
 
-  // 2. GUARDAR DATOS AUTOMÁTICAMENTE
-  useEffect(() => {
-    AsyncStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+  
+  useEffect(() => { AsyncStorage.setItem('cart', JSON.stringify(cart)); }, [cart]);
+  useEffect(() => { AsyncStorage.setItem('orders', JSON.stringify(orders)); }, [orders]);
 
-  useEffect(() => {
-    AsyncStorage.setItem('orders', JSON.stringify(orders));
-  }, [orders]);
-
-  // --- FUNCIONES DE USUARIO ---
+  // --- MÉTODOS DE USUARIO ---
   const loginUser = async (userData) => {
     setUser(userData);
     await AsyncStorage.setItem('user', JSON.stringify(userData));
@@ -57,82 +54,50 @@ export const CartProvider = ({ children }) => {
     await AsyncStorage.removeItem('user');
   };
 
-  // --- FUNCIONES DEL CARRITO ---
+  // --- MÉTODOS DEL CARRITO ---
   const addToCart = (product) => {
-    setCart((currentCart) => {
-      const existingProduct = currentCart.find(item => item.id === product.id);
-      if (existingProduct) {
-        return currentCart.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        return [...currentCart, { ...product, quantity: 1 }];
-      }
+    setCart(curr => {
+      const exists = curr.find(i => i.id === product.id);
+      return exists 
+        ? curr.map(i => i.id === product.id ? {...i, quantity: i.quantity + 1} : i)
+        : [...curr, { ...product, quantity: 1 }];
     });
   };
 
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCart((currentCart) =>
-      currentCart.map(item =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+  const updateQuantity = (id, q) => {
+    setCart(curr => curr.map(i => i.id === id ? {...i, quantity: Math.max(1, q)} : i));
   };
 
-  const removeFromCart = (productId) => {
-    setCart((currentCart) => currentCart.filter(item => item.id !== productId));
+  const removeFromCart = (id) => {
+    setCart(curr => curr.filter(i => i.id !== id));
   };
 
-  const clearCart = () => {
-    setCart([]);
-  };
+  const clearCart = () => setCart([]);
 
   const createOrder = () => {
     if (cart.length === 0) return;
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
     const newOrder = {
-      id: Date.now().toString(),
+      id: `ORD-${Date.now()}`,
       date: new Date().toISOString(),
       products: [...cart],
-      total: parseFloat(total.toFixed(2)),
-      status: 'pending',
+      total: cart.reduce((s, i) => s + i.price * i.quantity, 0),
+      status: 'pending'
     };
-
-    setOrders((currentOrders) => [newOrder, ...currentOrders]);
+    setOrders(curr => [newOrder, ...curr]);
     clearCart();
     return newOrder;
   };
 
-  const getCartTotal = () => {
-    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  };
+  const getCartTotal = () => cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const getCartItemsCount = () => cart.reduce((s, i) => s + i.quantity, 0);
 
-  const getCartItemsCount = () => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-  };
-
-  // 3. EL VALOR DEL CONTEXTO (Se define al final para que todas las funciones existan)
+  // --- VALORES EXPUESTOS ---
   const value = {
-    user,
-    cart,
-    orders,
-    loading,
-    loginUser,
-    logoutUser,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-    clearCart,
-    createOrder,
-    getCartTotal,
-    getCartItemsCount,
+    user, cart, orders, loading,
+    loginUser, logoutUser,
+    addToCart, updateQuantity, removeFromCart,
+    clearCart, createOrder, getCartTotal, getCartItemsCount
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
