@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert, StatusBar, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-// 1. IMPORTANTE: Importamos el hook para leer los datos globales
 import { useCart } from '../context/CartContext';
 
 const ProfileScreen = ({ navigation }) => {
-  // 2. EXTRAEMOS: Sacamos 'user' y 'logoutUser' del contexto
   const { orders, cart, user, logoutUser } = useCart();
 
   const handleLogout = () => {
@@ -15,11 +13,16 @@ const ProfileScreen = ({ navigation }) => {
         text: 'Cerrar sesión', 
         style: 'destructive', 
         onPress: async () => {
-          await logoutUser(); // Limpia los datos del teléfono
-          navigation.replace('Login'); // Te manda al Login
+          await logoutUser();
+          navigation.replace('Login');
         } 
       },
     ]);
+  };
+
+  // Función genérica para mostrar que la opción está en desarrollo
+  const handleFeatureUnderDev = (feature) => {
+    Alert.alert('Próximamente', `La opción de ${feature} estará disponible en la siguiente actualización.`);
   };
 
   return (
@@ -31,22 +34,15 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <SafeAreaView style={styles.contentSafeArea}>
-        <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
           
           {/* TARJETA DE PERFIL */}
           <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
               <Ionicons name="person-circle" size={90} color="#629766" />
             </View>
-            
-            {/* 3. CAMBIO DINÁMICO: Si hay usuario muestra su nombre, si no, dice Invitado */}
-            <Text style={styles.userName}>
-              {user ? user.name : 'Invitado'}
-            </Text>
-            
-            <Text style={styles.userEmail}>
-              {user ? user.email : 'Inicia sesión para comprar'}
-            </Text>
+            <Text style={styles.userName}>{user ? user.name : 'Invitado'}</Text>
+            <Text style={styles.userEmail}>{user ? user.email : 'Inicia sesión para comprar'}</Text>
 
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
@@ -56,18 +52,42 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.statDivider} />
               <View style={styles.statItem}>
                 <Text style={styles.statNumber}>{cart.length}</Text>
-                <Text style={styles.statLabel}>En carrito</Text>
+                <Text style={styles.statLabel}>Carrito</Text>
               </View>
             </View>
           </View>
 
-          {/* OPCIONES */}
+          {/* SECCIÓN: AJUSTES DE CUENTA */}
+          <Text style={styles.sectionLabel}>Ajustes de Cuenta</Text>
           <View style={styles.optionsContainer}>
-            <TouchableOpacity style={styles.optionItem}>
-              <Ionicons name="settings-outline" size={24} color="#666" />
-              <Text style={styles.optionText}>Configuración</Text>
-              <Ionicons name="chevron-forward" size={24} color="#ccc" />
+            
+            {/* Opción 1: Editar Perfil */}
+            <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('EditProfile')}>
+              <View style={[styles.iconBox, { backgroundColor: '#e8f5e9' }]}>
+                <Ionicons name="create-outline" size={22} color="#2e7d32" />
+              </View>
+              <Text style={styles.optionText}>Editar Perfil</Text>
+              <Ionicons name="chevron-forward" size={20} color="#ccc" />
             </TouchableOpacity>
+
+            {/* Opción 2: Dirección de Envío */}
+            <TouchableOpacity style={styles.optionItem} onPress={() => handleFeatureUnderDev('Direcciones')}>
+              <View style={[styles.iconBox, { backgroundColor: '#fff3e0' }]}>
+                <Ionicons name="location-outline" size={22} color="#ef6c00" />
+              </View>
+              <Text style={styles.optionText}>Dirección de Envío</Text>
+              <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            </TouchableOpacity>
+
+            {/* Opción 3: Configuración General */}
+            <TouchableOpacity style={styles.optionItem} onPress={() => handleFeatureUnderDev('Configuración')}>
+              <View style={[styles.iconBox, { backgroundColor: '#e3f2fd' }]}>
+                <Ionicons name="settings-outline" size={22} color="#1565c0" />
+              </View>
+              <Text style={styles.optionText}>Configuración General</Text>
+              <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            </TouchableOpacity>
+
           </View>
 
           {/* BOTÓN CERRAR SESIÓN */}
@@ -76,39 +96,26 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.logoutText}>Cerrar sesión</Text>
           </TouchableOpacity>
           
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: '#629766', 
-  },
+  mainContainer: { flex: 1, backgroundColor: '#629766' },
   header: {
-    backgroundColor: '#629766', 
+    backgroundColor: '#629766',
     paddingVertical: 18,
     alignItems: 'center',
-    paddingTop: (StatusBar.currentHeight || 0) + 10, 
+    paddingTop: (StatusBar.currentHeight || 0) + 10,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  contentSafeArea: {
-    flex: 1,
-    backgroundColor: '#f8f9fa', 
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-  },
+  headerTitle: { fontSize: 20, fontWeight: '700', color: '#fff' },
+  contentSafeArea: { flex: 1, backgroundColor: '#f8f9fa' },
+  scrollContainer: { padding: 20 },
   profileCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     alignItems: 'center',
     marginBottom: 25,
@@ -116,56 +123,65 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 10,
   },
-  avatarContainer: {
-    marginBottom: 10,
-  },
-  userName: { 
-    fontSize: 22, 
-    fontWeight: '700', 
-    color: '#333',
-    textTransform: 'capitalize' // Pone la primera letra en mayúscula
-  },
-  userEmail: { 
-    fontSize: 15, 
-    color: '#666', 
-    marginBottom: 20 
-  },
+  avatarContainer: { marginBottom: 10 },
+  userName: { fontSize: 22, fontWeight: '700', color: '#333', textTransform: 'capitalize' },
+  userEmail: { fontSize: 14, color: '#666', marginBottom: 20 },
   statsContainer: {
     flexDirection: 'row',
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 15,
+    padding: 15,
     width: '100%',
   },
   statItem: { flex: 1, alignItems: 'center' },
-  statNumber: { fontSize: 24, fontWeight: '700', color: '#629766' },
-  statLabel: { fontSize: 13, color: '#666' },
-  statDivider: { width: 1, height: 40, backgroundColor: '#ddd' },
+  statNumber: { fontSize: 20, fontWeight: '700', color: '#629766' },
+  statLabel: { fontSize: 12, color: '#999', marginTop: 2 },
+  statDivider: { width: 1, height: 30, backgroundColor: '#ddd' },
+  
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#999',
+    marginBottom: 10,
+    marginLeft: 5,
+    textTransform: 'uppercase',
+  },
   optionsContainer: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 20,
     marginBottom: 25,
+    overflow: 'hidden',
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#f1f1f1',
   },
-  optionText: { flex: 1, fontSize: 16, marginLeft: 16, color: '#333' },
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  optionText: { flex: 1, fontSize: 16, color: '#333', fontWeight: '500' },
   logoutButton: {
     backgroundColor: '#dc3545',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 15,
     gap: 10,
+    marginTop: 10,
+    marginBottom: 30,
   },
-  logoutText: { color: '#fff', fontSize: 17, fontWeight: '600' },
+  logoutText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
 
 export default ProfileScreen;
