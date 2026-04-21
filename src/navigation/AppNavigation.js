@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TabNavigator from './TabNavigator';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
-
+import RegisterScreen from '../screens/RegisterScreen';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -20,6 +20,7 @@ const AppNavigator = () => {
     >
   
       <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }}/>
+      <Stack.Screen name="Register" component={RegisterScreen}  options={{ headerShown: false }}/>
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={({ route }) => ({
           title: route.params?.product?.title || 'Detalle',headerShown: true,})}/>
 
