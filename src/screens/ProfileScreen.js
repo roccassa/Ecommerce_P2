@@ -57,11 +57,11 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </View>
 
-          {/* SECCIÓN: AJUSTES DE CUENTA */}
+        
           <Text style={styles.sectionLabel}>Ajustes de Cuenta</Text>
           <View style={styles.optionsContainer}>
             
-            {/* Opción 1: Editar Perfil */}
+            
             <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('EditProfile')}>
               <View style={[styles.iconBox, { backgroundColor: '#e8f5e9' }]}>
                 <Ionicons name="create-outline" size={22} color="#2e7d32" />
@@ -70,8 +70,8 @@ const ProfileScreen = ({ navigation }) => {
               <Ionicons name="chevron-forward" size={20} color="#ccc" />
             </TouchableOpacity>
 
-            {/* Opción 2: Dirección de Envío */}
-            <TouchableOpacity style={styles.optionItem} onPress={() => handleFeatureUnderDev('Direcciones')}>
+           
+            <TouchableOpacity style={styles.optionItem} onPress={() => navigation.navigate('ShippingAddress')}>
               <View style={[styles.iconBox, { backgroundColor: '#fff3e0' }]}>
                 <Ionicons name="location-outline" size={22} color="#ef6c00" />
               </View>
@@ -79,7 +79,7 @@ const ProfileScreen = ({ navigation }) => {
               <Ionicons name="chevron-forward" size={20} color="#ccc" />
             </TouchableOpacity>
 
-            {/* Opción 3: Configuración General */}
+          
             <TouchableOpacity style={styles.optionItem} onPress={() => handleFeatureUnderDev('Configuración')}>
               <View style={[styles.iconBox, { backgroundColor: '#e3f2fd' }]}>
                 <Ionicons name="settings-outline" size={22} color="#1565c0" />
@@ -90,7 +90,7 @@ const ProfileScreen = ({ navigation }) => {
 
           </View>
 
-          {/* BOTÓN CERRAR SESIÓN */}
+          
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Ionicons name="log-out-outline" size={22} color="#fff" />
             <Text style={styles.logoutText}>Cerrar sesión</Text>
