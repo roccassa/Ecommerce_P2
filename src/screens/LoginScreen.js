@@ -1,37 +1,47 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, StatusBar, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity,Image,  StyleSheet, SafeAreaView, Alert, StatusBar, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-// 1. CAMBIO: Importamos el hook para usar el contexto
+import LogoEmpresa from '../../assets/logo-r.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { useCart } from '../context/CartContext'; 
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  // 2. CAMBIO: Extraemos loginUser del contexto
   const { loginUser } = useCart(); 
 
-  const handleLogin = () => {
+  const handleLogin = async () => { 
     if (!email || !password) {
       Alert.alert('Error', 'Por favor ingresa tus credenciales');
       return;
     }
 
-    // --- Lógica de Simulación ---
-    // En una app real, aquí harías el fetch a tu API de C#
-    // Por ahora, vamos a registrar un nombre genérico basado en el email
-    const nameFromEmail = email.split('@')[0]; // Saca "francisco" de "francisco@correo.com"
-    
-    // 3. CAMBIO: Guardamos al usuario en el contexto antes de entrar
-    loginUser({ 
-      name: nameFromEmail, 
-      email: email 
-    });
+    try {
+      // 1. Obtener la lista de usuarios guardados
+      const usersJson = await AsyncStorage.getItem('@RegisteredUsers');
+      const users = usersJson ? JSON.parse(usersJson) : [];
 
-    console.log('Iniciando sesión con:', email);
-    
-    Alert.alert('Bienvenido', `Hola de nuevo, ${nameFromEmail}`);
-    navigation.replace('MainTabs'); 
+      // 2. Buscar si las credenciales coinciden
+      const foundUser = users.find(u => u.email === email && u.password === password);
+
+      if (foundUser) {
+        // 3. Si existe, guardar la sesión en el contexto y entrar
+        loginUser({ 
+          name: foundUser.name, 
+          email: foundUser.email 
+        });
+
+        Alert.alert('Bienvenido', `Hola de nuevo, ${foundUser.name}`);
+        navigation.replace('MainTabs'); 
+      } else {
+        // 4. Si no coincide, lanzar error real
+        Alert.alert('Error', 'Correo o contraseña incorrectos');
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Ocurrió un problema al validar los datos');
+    }
   };
 
   return (
@@ -50,7 +60,11 @@ const LoginScreen = ({ navigation }) => {
           <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             
             <View style={styles.iconContainer}>
-              <Ionicons name="log-in-outline" size={100} color="#629766" />
+              <Image 
+                  source={LogoEmpresa} 
+                  style={styles.logoImage} 
+                  resizeMode="contain"  
+              />
               <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
             </View>
 
@@ -130,7 +144,13 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
+  //  marginTop: 10,
+  },
+  logoImage: {
+    width: 350,  // Ajusta el ancho según prefieras
+    height: 350, // Ajusta el alto según prefieras
+    marginBottom: 5, // Espacio entre la imagen y el texto "Inicia sesión..."
   },
   subtitle: {
     fontSize: 16,
@@ -182,6 +202,7 @@ const styles = StyleSheet.create({
   registerLinkText: {
     fontSize: 15,
     color: '#666',
+    marginBottom: 30,
   },
 });
 

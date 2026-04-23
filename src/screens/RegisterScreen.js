@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, StatusBar, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -8,7 +9,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
+const handleRegister = async () => { // Agregamos async
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Por favor llena todos los campos');
       return;
@@ -17,9 +18,29 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert('Error', 'Las contraseñas no coinciden');
       return;
     }
-    
-    
-    Alert.alert('Éxito', 'Cuenta creada correctamente');
+
+    try {
+      // 1. Obtener la lista actual de usuarios
+      const existingUsers = await AsyncStorage.getItem('@RegisteredUsers');
+      const users = existingUsers ? JSON.parse(existingUsers) : [];
+
+      // 2. Verificar si el correo ya existe
+      if (users.find(u => u.email === email)) {
+        Alert.alert('Error', 'Este correo ya está registrado');
+        return;
+      }
+
+      // 3. Agregar el nuevo usuario y guardar
+      const newUser = { name, email, password };
+      users.push(newUser);
+      await AsyncStorage.setItem('@RegisteredUsers', JSON.stringify(users));
+
+      Alert.alert('Éxito', 'Cuenta creada correctamente', [
+        { text: 'Ir al Login', onPress: () => navigation.navigate('Login') }
+      ]);
+    } catch (e) {
+      Alert.alert('Error', 'No se pudo guardar la información');
+    }
   };
 
   return (

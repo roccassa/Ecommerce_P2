@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
 
 const ProfileScreen = ({ navigation }) => {
-  const { orders, cart, user, logoutUser } = useCart();
+const { user, orders, cart, logoutUser } = useCart();
 
   const handleLogout = () => {
     Alert.alert('Cerrar sesión', '¿Estás seguro de que quieres salir?', [
@@ -23,6 +23,15 @@ const ProfileScreen = ({ navigation }) => {
   // Función genérica para mostrar que la opción está en desarrollo
   const handleFeatureUnderDev = (feature) => {
     Alert.alert('Próximamente', `La opción de ${feature} estará disponible en la siguiente actualización.`);
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateUser({ name: newName });
+      Alert.alert("Éxito", "Perfil actualizado correctamente");
+    } catch (error) {
+      Alert.alert("Error", "No se pudo guardar el nombre");
+    }
   };
 
   return (

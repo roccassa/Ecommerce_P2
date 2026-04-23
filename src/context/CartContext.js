@@ -42,6 +42,7 @@ export const CartProvider = ({ children }) => {
   
   useEffect(() => { AsyncStorage.setItem('cart', JSON.stringify(cart)); }, [cart]);
   useEffect(() => { AsyncStorage.setItem('orders', JSON.stringify(orders)); }, [orders]);
+  useEffect(() => {  if (user) { AsyncStorage.setItem('user', JSON.stringify(user)); } }, [user]);
 
   // --- MÉTODOS DE USUARIO ---
   const loginUser = async (userData) => {
@@ -98,6 +99,27 @@ export const CartProvider = ({ children }) => {
     ));
   };
 
+  const updateUser = async (updatedData) => {
+    // 1. Actualizamos el estado para que se vea el cambio de inmediato
+    const newUser = { ...user, ...updatedData };
+    setUser(newUser);
+    
+    // 2. Lo guardamos en AsyncStorage para que persista al cerrar la app
+    await AsyncStorage.setItem('user', JSON.stringify(newUser));
+    
+    // 3. (Opcional) Si quieres que también cambie en la lista de registros:
+    const usersJson = await AsyncStorage.getItem('@RegisteredUsers');
+    if (usersJson) {
+      const users = JSON.parse(usersJson);
+      const updatedUsers = users.map(u => 
+        u.email === newUser.email ? { ...u, ...updatedData } : u
+      );
+      await AsyncStorage.setItem('@RegisteredUsers', JSON.stringify(updatedUsers));
+    }
+  };
+
+
+
   const getCartTotal = () => cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const getCartItemsCount = () => cart.reduce((s, i) => s + i.quantity, 0);
 
@@ -108,7 +130,8 @@ export const CartProvider = ({ children }) => {
     addToCart, updateQuantity, removeFromCart,
     clearCart, createOrder, getCartTotal, getCartItemsCount,
     deleteOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    updateUser
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

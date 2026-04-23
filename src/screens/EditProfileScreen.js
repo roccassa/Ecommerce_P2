@@ -4,7 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
 
 const EditProfileScreen = ({ navigation }) => {
-  const { user, loginUser } = useCart();
+  //const { user, loginUser } = useCart();
+  //const [newName, setNewName] = useState(user?.name || '');
+
+  const { user, updateUser } = useCart(); 
   const [newName, setNewName] = useState(user?.name || '');
 
   const handleSave = async () => {
@@ -12,8 +15,11 @@ const EditProfileScreen = ({ navigation }) => {
       Alert.alert('Error', 'El nombre no puede estar vacío');
       return;
     }
+
+    await updateUser({ name: newName });
+
     // Actualizamos el usuario en el contexto
-    await loginUser({ ...user, name: newName });
+    //await loginUser({ ...user, name: newName });
     Alert.alert('Éxito', 'Perfil actualizado correctamente');
     navigation.goBack();
   };
