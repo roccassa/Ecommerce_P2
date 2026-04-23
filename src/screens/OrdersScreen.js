@@ -1,11 +1,24 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
 import { format } from 'date-fns';
 
 const OrdersScreen = () => {
-    const { orders } = useCart();
+    //const { orders } = useCart();
+    const { orders, deleteOrder, updateOrderStatus } = useCart();
+
+    // 2. Función para confirmar eliminación
+    const handleDeleteOrder = (id) => {
+        Alert.alert(
+            'Eliminar Pedido',
+            '¿Estás seguro de que quieres eliminar este pedido del historial?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Eliminar', style: 'destructive', onPress: () => deleteOrder(id) }
+            ]
+        );
+    };
 
     const renderOrderItem = ({ item }) => {
         const orderDate = new Date(item.date);
@@ -19,11 +32,23 @@ const OrdersScreen = () => {
                             {format(orderDate, 'dd MMMM yyyy - HH:mm')}
                         </Text>
                     </View>
-                    <View style={styles.statusContainer}>
-                        <Text style={styles.statusText}>
-                            {item.status === 'pending' ? 'Pendiente' : 'Completado'}
+                    
+                    {/* BOTÓN PARA EDITAR ESTADO (Update) */}
+                    <TouchableOpacity 
+                        style={[
+                            styles.statusContainer, 
+                            { backgroundColor: item.status === 'pending' ? '#fff3cd' : '#d4edda' }
+                        ]}
+                        onPress={() => {
+                            const nextStatus = item.status === 'pending' ? 'completed' : 'pending';
+                            updateOrderStatus(item.id, nextStatus);
+                        }}>
+                        <Text style={[
+                            styles.statusText, 
+                            { color: item.status === 'pending' ? '#856404' : '#155724' }]}>
+                            {item.status === 'pending' ? 'Pendiente ⏳' : 'Completado ✅'}
                         </Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
 
@@ -42,9 +67,22 @@ const OrdersScreen = () => {
                 </View>
 
                 <View style={styles.orderFooter}>
-                    <Text style={styles.totalLabel}>Total del pedido</Text>
+                <View>
+                    <Text style={styles.totalLabel}>Total</Text>
                     <Text style={styles.totalAmount}>${item.total.toFixed(2)}</Text>
                 </View>
+
+                {/* BOTÓN PARA ELIMINAR (Delete) */}
+                <TouchableOpacity 
+                    style={styles.deleteOrderButton}
+                    onPress={() => handleDeleteOrder(item.id)}
+                >
+                    <Ionicons name="trash-outline" size={20} color="#dc3545" />
+                    <Text style={styles.deleteText}>Eliminar</Text>
+                </TouchableOpacity>
+            </View>
+
+
             </View>
         );
     };
@@ -87,7 +125,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f9fa',
     },
     header: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#629766',
         paddingVertical: 16,
         paddingHorizontal: 20,
         flexDirection: 'row',
@@ -95,7 +133,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 20,
+        fontSize: 22,
+        fontWeight: '700',
+        marginTop: 16,
         fontWeight: '700',
         color: '#fff',
     },
@@ -206,6 +246,32 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#999',
         textAlign: 'center',
+    },
+    orderFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    deleteOrderButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 8,
+        borderRadius: 8,
+        backgroundColor: '#fff5f5',
+    },
+    deleteText: {
+        color: '#dc3545',
+        marginLeft: 5,
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    statusContainer: {
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#eee',
     },
 });
 

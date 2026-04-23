@@ -88,6 +88,16 @@ export const CartProvider = ({ children }) => {
     return newOrder;
   };
 
+  const deleteOrder = (orderId) => {
+    setOrders(curr => curr.filter(order => order.id !== orderId));
+  };
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders(curr => curr.map(order => 
+      order.id === orderId ? { ...order, status: newStatus } : order
+    ));
+  };
+
   const getCartTotal = () => cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const getCartItemsCount = () => cart.reduce((s, i) => s + i.quantity, 0);
 
@@ -96,7 +106,9 @@ export const CartProvider = ({ children }) => {
     user, cart, orders, loading,
     loginUser, logoutUser,
     addToCart, updateQuantity, removeFromCart,
-    clearCart, createOrder, getCartTotal, getCartItemsCount
+    clearCart, createOrder, getCartTotal, getCartItemsCount,
+    deleteOrder,
+    updateOrderStatus
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
