@@ -20,7 +20,6 @@ const { user, orders, cart, logoutUser } = useCart();
     ]);
   };
 
-  // Función genérica para mostrar que la opción está en desarrollo
   const handleFeatureUnderDev = (feature) => {
     Alert.alert('Próximamente', `La opción de ${feature} estará disponible en la siguiente actualización.`);
   };
